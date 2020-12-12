@@ -64,7 +64,7 @@ def numsinput(message):
             a = len(mes) + 1
             d = int(nums[0])
             m = int(nums[1])
-            M = int(nums[2])
+            m1 = int(nums[2])
 
             # numerate dict
             alph = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
@@ -85,13 +85,13 @@ def numsinput(message):
                 # numbers2 (lemer pseudo-random key) + modulo 2 for both
                 interim = []
                 for i in range(1, a):
-                    def lemer(i, d, m, M):
+                    def lemer(i, d, m, m1):
                         if i == 1:
-                            return (d + i * m) % M
+                            return (d + i * m) % m1
                         else:
-                            return (d + lemer(i - 1, d, m, M) * m) % M
+                            return (d + lemer(i - 1, d, m, m1) * m) % m1
 
-                    interim.append(lemer(i, d, m, M))
+                    interim.append(lemer(i, d, m, m1))
                 for i in interim:
                     def modulo25(i):
                         if i > -1 and i < 26:
