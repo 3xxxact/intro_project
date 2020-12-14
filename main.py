@@ -39,121 +39,133 @@ def help_message(message):
                                       'if decrypter don\'t know the settings.')
 
 
-# input
-@bot.message_handler(content_types=['text'])
-def numsinput(message):
-    out = message.text
+@bot.message_handler(commands=['cipher'])
+def send_welcome(message):
+    msg = bot.reply_to(message, "Set three random numbers comma separated"
+                                "\nEx: 1,2,3")
+    bot.register_next_step_handler(msg, process_nums_step)
 
-    # process
-    # settings_bot
-    sett = out.split(' ')
-    if len(sett) == 3:
-        choice = sett[2].lower()
-        nums = sett[0]
-        nums = nums.split(',')
-        mes = sett[1].lower()
-        nn1 = nums[0]
-        nn2 = nums[1]
-        nn3 = nums[2]
-        # sdelai/sprosi/udali proverku 'nums'
-        if nn1.isdigit() is True and nn2.isdigit() is True and \
-                nn3.isdigit() is True:
-            # settings_process
-            num1 = []
-            num2 = []
-            a = len(mes) + 1
-            d = int(nums[0])
-            m = int(nums[1])
-            m1 = int(nums[2])
 
-            # numerate dict
-            alph = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-                    'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
-                    'v', 'w', 'x', 'y', 'z']
-            y = 0
-            numerate = {}
-            for i in alph:
-                numerate[i] = y
-                y = y + 1
+setch = []
 
-            # check message
-            if mes.isalpha() is True:
-                # numbers1 (of message) for both
-                for i in mes:
-                    num1.append(numerate[i])
 
-                # numbers2 (lemer pseudo-random key) + modulo 2 for both
-                interim = []
-                for i in range(1, a):
-                    def lemer(i, d, m, m1):
-                        if i == 1:
-                            return (d + i * m) % m1
-                        else:
-                            return (d + lemer(i - 1, d, m, m1) * m) % m1
+def process_nums_step(message):
+    nums = message.text
+    setch.clear()
+    setch.append(nums)
+    msg = bot.reply_to(message, "Do you want to encrypt or "
+                                "decrypt the message?")
+    bot.register_next_step_handler(msg, process_method_step)
 
-                    interim.append(lemer(i, d, m, m1))
-                for i in interim:
-                    def modulo25(i):
-                        if i > -1 and i < 26:
-                            return i
-                        else:
-                            return modulo25(i - 25)
 
-                    num2.append(modulo25(i))
-
-                # numbers3 (sum of num1 and num2) for encrypt
-                num3 = []
-                interim2 = []
-                for i in range(len(num1)):
-                    x = num1[i] + num2[i]
-                    interim2.append(x)
-                for i in interim2:
-                    num3.append(modulo25(i))
-
-                # numbers3 for decrypt
-                dnum3 = []
-                interim3 = []
-                for i in range(len(num1)):
-                    y = num1[i] - num2[i]
-                    interim3.append(y)
-                for l in interim3:
-                    def minusmodulo(l):
-                        if l > -1:
-                            return l
-                        else:
-                            return minusmodulo(l + 25)
-
-                    dnum3.append(minusmodulo(l))
-
-                # output cipher
-                vrem = []
-                gotov1 = ''
-                gotov2 = ''
-                for i in num3:
-                    vrem.append(alph[i])
-                for k in vrem:
-                    gotov1 = gotov1 + k
-                vrem.clear()
-                for o in dnum3:
-                    vrem.append(alph[o])
-                for p in vrem:
-                    gotov2 = gotov2 + p
-
-                # input check
-                if choice == 'encrypt':
-                    bot.send_message(message.chat.id, gotov1)
-                elif choice == 'decrypt':
-                    bot.send_message(message.chat.id, gotov2)
-                else:
-                    bot.send_message(message.chat.id, 'Wrong choice! You must',
-                                     'write "encrypt"',
-                                     'or "decrypt"')
-            else:
-                bot.send_message(message.chat.id, 'Wrong message!')
-        else:
-            bot.send_message(message.chat.id, 'Wrong numbers!')
+def process_method_step(message):
+    method = message.text
+    if method == "encrypt":
+        setch.append(method)
+        msg = bot.reply_to(message, "Send the message you want to encrypt")
+        bot.register_next_step_handler(msg, process_message_step)
+    elif method == "decrypt":
+        setch.append(method)
+        msg = bot.reply_to(message, "Send the message you want to decrypt")
+        bot.register_next_step_handler(msg, process_message_step)
     else:
-        bot.send_message(message.chat.id, 'Something wrong! Do like on ex.')
+        bot.send_message(message.chat_id, "Wrong input. Please write"
+                                          "'encrypt' or 'decrypt'")
+
+
+def process_message_step(message):
+    mes = message.text
+    setch.append(mes)
+
+    choice = setch[1].lower()
+    nums = setch[0]
+    nums = nums.split(',')
+    mes = setch[2].lower()
+
+    # settings_process
+    num1 = []
+    num2 = []
+    a = len(mes) + 1
+    d = int(nums[0])
+    m = int(nums[1])
+    m1 = int(nums[2])
+
+    # numerate dict
+    alph = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+            'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+            'v', 'w', 'x', 'y', 'z']
+    y = 0
+    numerate = {}
+    for i in alph:
+        numerate[i] = y
+        y = y + 1
+
+    # numbers1 (of message) for both
+    for i in mes:
+        num1.append(numerate[i])
+
+    # numbers2 (lemer pseudo-random key) + modulo 2 for both
+    interim = []
+    for i in range(1, a):
+        def lemer(i, d, m, m1):
+            if i == 1:
+                return (d + i * m) % m1
+            else:
+                return (d + lemer(i - 1, d, m, m1) * m) % m1
+
+        interim.append(lemer(i, d, m, m1))
+    for i in interim:
+        def modulo25(i):
+            if i > -1 and i < 26:
+                return i
+            else:
+                return modulo25(i - 25)
+
+        num2.append(modulo25(i))
+
+    # numbers3 (sum of num1 and num2) for encrypt
+    num3 = []
+    interim2 = []
+    for i in range(len(num1)):
+        x = num1[i] + num2[i]
+        interim2.append(x)
+    for i in interim2:
+        num3.append(modulo25(i))
+
+    # numbers3 for decrypt
+    dnum3 = []
+    interim3 = []
+    for i in range(len(num1)):
+        y = num1[i] - num2[i]
+        interim3.append(y)
+    for l in interim3:
+        def minusmodulo(l):
+            if l > -1:
+                return l
+            else:
+                return minusmodulo(l + 25)
+
+        dnum3.append(minusmodulo(l))
+
+    # output cipher
+    vrem = []
+    gotov1 = ''
+    gotov2 = ''
+    for i in num3:
+        vrem.append(alph[i])
+    for k in vrem:
+        gotov1 = gotov1 + k
+    vrem.clear()
+    for o in dnum3:
+        vrem.append(alph[o])
+    for p in vrem:
+        gotov2 = gotov2 + p
+
+
+    if choice == 'encrypt':
+        bot.send_message(message.chat.id, gotov1)
+    elif choice == 'decrypt':
+        bot.send_message(message.chat.id, gotov2)
 
 
 bot.polling()
