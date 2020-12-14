@@ -161,7 +161,6 @@ def process_message_step(message):
     for p in vrem:
         gotov2 = gotov2 + p
 
-
     if choice == 'encrypt':
         bot.send_message(message.chat.id, gotov1)
     elif choice == 'decrypt':
