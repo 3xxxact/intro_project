@@ -69,7 +69,7 @@ def process_method_step(message):
         msg = bot.reply_to(message, "Send the message you want to decrypt")
         bot.register_next_step_handler(msg, process_message_step)
     else:
-        bot.send_message(message.chat_id, "Wrong input. Please write"
+        msg = bot.reply_to(message.chat_id, "Wrong input. Please write"
                                           "'encrypt' or 'decrypt'")
 
 
@@ -160,7 +160,6 @@ def process_message_step(message):
         vrem.append(alph[o])
     for p in vrem:
         gotov2 = gotov2 + p
-
 
     if choice == 'encrypt':
         bot.send_message(message.chat.id, gotov1)
