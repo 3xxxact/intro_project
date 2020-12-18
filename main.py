@@ -12,7 +12,9 @@ def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
     markup.add('/help', '/info')
     bot.send_message(message.chat.id, 'Hey!\nHow to use this bot? Choose /help'
-                                      '\nInfo about this bot? Choose /info',
+                                      '\nInfo about this bot? Choose /info'
+                                      '\nIf you already know how to use this '
+                                      'bot, choose /cipher',
                                       reply_markup=markup)
 
 
@@ -51,11 +53,18 @@ setch = []
 
 def process_nums_step(message):
     nums = message.text
+    nums1 = nums.replace(",", "")
     setch.clear()
-    setch.append(nums)
-    msg = bot.reply_to(message, "Do you want to encrypt or "
-                                "decrypt the message?")
-    bot.register_next_step_handler(msg, process_method_step)
+    if nums1.isdigit() and len(nums1) == 3:
+        msg = bot.reply_to(message, "Do you want to encrypt or "
+                                    "decrypt the message?")
+        setch.append(nums)
+        bot.register_next_step_handler(msg, process_method_step)
+    else:
+        msg = bot.reply_to(message, "Wrong input. Please write three numbers "
+                                    "comma separated without any left out "
+                                    "spaces as in the example: 1,2,3")
+        bot.register_next_step_handler(msg, process_nums_step)
 
 
 def process_method_step(message):
@@ -69,8 +78,9 @@ def process_method_step(message):
         msg = bot.reply_to(message, "Send the message you want to decrypt")
         bot.register_next_step_handler(msg, process_message_step)
     else:
-        msg = bot.reply_to(message.chat_id, "Wrong input. Please write"
-                                          "'encrypt' or 'decrypt'")
+        msg = bot.reply_to(message, "Wrong input. Please write"
+                                    "'encrypt' or 'decrypt'")
+        bot.register_next_step_handler(msg, process_method_step)
 
 
 def process_message_step(message):
