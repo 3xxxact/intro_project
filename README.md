@@ -1,4 +1,4 @@
-# intro_project
+# The Vigenère cipher telegram bot
 The Vigenère cipher is a method of encrypting alphabetic text by using a series of interwoven Caesar ciphers, based on the letters of a keyword.
 
 ## Description
